@@ -4,11 +4,32 @@ import (
 	"database/sql"
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/Adarshrai24/url-shortener/db"
 	"github.com/Adarshrai24/url-shortener/models"
 	"github.com/Adarshrai24/url-shortener/utils"
 )
+
+func candidateKey(longURL string) (string, error) {
+	for counter := 0; ;counter++ {
+		input := longURL + ":" + strconv.Itoa(counter)
+		key := utils.Hash(input)
+		var exists bool
+		err := db.DB.QueryRow(
+			`SELECT EXISTS(
+				SELECT 1 FROM public.url WHERE key = $1	
+			)`,
+			key,
+		).Scan(&exists)
+		if err != nil {
+			return "", err
+		} 
+		if !exists {
+			return key, nil
+		}
+	}
+}
 
 func ShortenURL(w http.ResponseWriter, r *http.Request) {
 	longURL := r.URL.Query().Get("url")
@@ -16,8 +37,6 @@ func ShortenURL(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "missing url parameter", http.StatusBadRequest)
 		return
 	}
-
-	key := utils.Hash(longURL)
 
 	var url models.Url
 	err := db.DB.QueryRow(
@@ -38,6 +57,11 @@ func ShortenURL(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	key, err := candidateKey(longURL)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 	url = models.Url{
 		LongURL:  longURL,
 		ShortURL: "http://localhost:8090/" + key,
