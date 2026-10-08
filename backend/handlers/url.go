@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/Adarshrai24/url-shortener/db"
 	"github.com/Adarshrai24/url-shortener/models"
 	"github.com/Adarshrai24/url-shortener/utils"
-	"github.com/Adarshrai24/url-shortener/db"
 )
 
 func ShortenURL(w http.ResponseWriter, r *http.Request) {
@@ -23,8 +23,8 @@ func ShortenURL(w http.ResponseWriter, r *http.Request) {
 	err := db.DB.QueryRow(
 		`SELECT id, key, short_url, long_url
 		 FROM public.url
-		 WHERE key = $1`,
-		key,
+		 WHERE long_url = $1`,
+		longURL,
 	).Scan(&url.ID, &url.Key, &url.ShortURL, &url.LongURL)
 
 	if err == nil {
@@ -60,7 +60,6 @@ func ShortenURL(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewEncoder(w).Encode(url)
 }
 
-
 func GetURL(w http.ResponseWriter, r *http.Request) {
 	key := r.PathValue("key")
 	row := db.DB.QueryRow(
@@ -69,12 +68,12 @@ func GetURL(w http.ResponseWriter, r *http.Request) {
 		`,
 		key,
 	)
-	
-	var URL models.Url 
+
+	var URL models.Url
 	err := row.Scan(
 		&URL.ID, &URL.Key, &URL.ShortURL, &URL.LongURL,
 	)
-	
+
 	if err == sql.ErrNoRows {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
