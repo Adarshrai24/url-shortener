@@ -3,9 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>URL Shortener</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    
+    <h1 id="heading">URL Shortener</h1>
+   <form id="longurl">
+    <label for="lurl">Long URL:</label><br>
+    <input type="url" id="lurl" name="lurl"><br>
+    <input type="submit" value="Short">
+   </form> 
+   <label for="surl" id="shorturl">Short URL:</label>
+   <input type="url" id="surl" name="surl" readonly><br>
+   <button id="copy">Copy</button>
+   <button id="delete">Delete</button>
+   <script src="index.js"></script>
 </body>
 </html>

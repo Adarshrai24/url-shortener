@@ -1,0 +1,21 @@
+#heading{
+    color: aliceblue;
+    margin-top: 100px;
+    margin-left: 615px;
+}
+body{
+    background-color: lightblue;
+}
+#longurl{
+    margin-top: 100px;
+    margin-left: 600px;
+}
+#shorturl{
+    margin-left: 600px;
+}
+#surl{
+    margin-left: 600px;
+}
+#copy{
+    margin-left: 600px;
+}
