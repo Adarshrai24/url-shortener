@@ -34,30 +34,10 @@ func main(){
 	if err != nil {
 		log.Fatal(err)
 	}
-	var database, schema string
-	err = conn.QueryRow(
-		`SELECT current_database(), current_schema()`,
-	).Scan(&database, &schema)
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Printf("Connected to database=%q schema=%q", database, schema)
-	var tableName *string
-
-	err = conn.QueryRow(`SELECT to_regclass('public.url')`).Scan(&tableName)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	if tableName == nil {
-		log.Println("Table public.url does not exist")
-	} else {
-		log.Printf("Table exists: %s", *tableName)
-	}
-
-
+	
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /", handlers.ShortenURL)
 	mux.HandleFunc("GET /{key}", handlers.GetURL)
+	mux.HandleFunc("DELETE /{key}", handlers.DeleteURL)
 	http.ListenAndServe(":8090", mux)
 }

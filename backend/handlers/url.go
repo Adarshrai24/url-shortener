@@ -12,7 +12,7 @@ import (
 )
 
 func candidateKey(longURL string) (string, error) {
-	for counter := 0; ;counter++ {
+	for counter := 0; ; counter++ {
 		input := longURL + ":" + strconv.Itoa(counter)
 		key := utils.Hash(input)
 		var exists bool
@@ -24,7 +24,7 @@ func candidateKey(longURL string) (string, error) {
 		).Scan(&exists)
 		if err != nil {
 			return "", err
-		} 
+		}
 		if !exists {
 			return key, nil
 		}
@@ -99,7 +99,7 @@ func GetURL(w http.ResponseWriter, r *http.Request) {
 	)
 
 	if err == sql.ErrNoRows {
-		http.Error(w, err.Error(), http.StatusNotFound)
+		http.Error(w, "URL not found", http.StatusNotFound)
 		return
 	}
 
@@ -109,4 +109,22 @@ func GetURL(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, URL.LongURL, http.StatusFound)
+}
+
+func DeleteURL(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	key := r.PathValue("key")
+	_, err := db.DB.Exec(
+		`DELETE FROM public.url
+		WHERE key = $1	
+		`,
+		key,
+	)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNotFound)
 }
