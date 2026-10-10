@@ -24,7 +24,7 @@ document.getElementById("longurl").onsubmit = async function(event) {
     } 
 };
 
-function copyUrl(){
+document.getElementById("copy").onclick = function() {
     const shortUrl = document.getElementById("surl").value;
     navigator.clipboard.writeText(shortUrl)
     .then(() => {
