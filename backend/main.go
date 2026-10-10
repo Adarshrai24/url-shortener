@@ -36,6 +36,16 @@ func main(){
 	}
 	
 	mux := http.NewServeMux()
+	mux.Handle(
+		"GET /static/",
+		http.StripPrefix(
+			"/static/",
+			http.FileServer(http.Dir("../frontend")),
+		),
+	)
+	mux.HandleFunc("GET /{$}", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "../frontend/index.html")
+	})
 	mux.HandleFunc("POST /", handlers.ShortenURL)
 	mux.HandleFunc("GET /{key}", handlers.GetURL)
 	mux.HandleFunc("DELETE /{key}", handlers.DeleteURL)

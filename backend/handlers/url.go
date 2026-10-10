@@ -32,14 +32,15 @@ func candidateKey(longURL string) (string, error) {
 }
 
 func ShortenURL(w http.ResponseWriter, r *http.Request) {
-	longURL := r.URL.Query().Get("url")
-	if longURL == "" {
+	var req models.Req
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
 		http.Error(w, "missing url parameter", http.StatusBadRequest)
 		return
 	}
-
+	longURL := req.URL	
 	var url models.Url
-	err := db.DB.QueryRow(
+	err = db.DB.QueryRow(
 		`SELECT id, key, short_url, long_url
 		 FROM public.url
 		 WHERE long_url = $1`,
@@ -114,7 +115,7 @@ func GetURL(w http.ResponseWriter, r *http.Request) {
 func DeleteURL(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	key := r.PathValue("key")
-	_, err := db.DB.Exec(
+	result, err := db.DB.Exec(
 		`DELETE FROM public.url
 		WHERE key = $1	
 		`,
@@ -125,6 +126,15 @@ func DeleteURL(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	rows, err := result.RowsAffected()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if rows == 0 {
+		http.Error(w, "URL not found", http.StatusNotFound)
+		return
+	}
 
-	w.WriteHeader(http.StatusNotFound)
+	w.WriteHeader(http.StatusNoContent)
 }
