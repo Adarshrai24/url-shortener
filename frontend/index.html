@@ -4,19 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>URL Shortener</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
     <h1 id="heading">URL Shortener</h1>
    <form id="longurl">
     <label for="lurl">Long URL:</label><br>
-    <input type="url" id="lurl" name="lurl"><br>
-    <input type="submit" value="Short">
+    <input type="url" id="lurl" name="lurl" required><br>
+    <input type="submit" value="Short" id="short">
    </form> 
    <label for="surl" id="shorturl">Short URL:</label>
    <input type="url" id="surl" name="surl" readonly><br>
-   <button id="copy">Copy</button>
+   <button id="copy" onclick="copyUrl()">Copy</button>
+   <span id="copy-status" aria-live="polite"></span>
    <button id="delete">Delete</button>
-   <script src="index.js"></script>
+   <script src="/static/index.js"></script>
 </body>
 </html>
