@@ -3,12 +3,12 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
-	"net/http"
-	"strconv"
-
 	"github.com/Adarshrai24/url-shortener/db"
 	"github.com/Adarshrai24/url-shortener/models"
 	"github.com/Adarshrai24/url-shortener/utils"
+	"net/http"
+	"os"
+	"strconv"
 )
 
 func candidateKey(longURL string) (string, error) {
@@ -63,9 +63,10 @@ func ShortenURL(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	baseUrl := os.Getenv("BASE_URL")
 	url = models.Url{
 		LongURL:  longURL,
-		ShortURL: "http://localhost:8090/" + key,
+		ShortURL: baseUrl + "/" + key,
 		Key:      key,
 	}
 
