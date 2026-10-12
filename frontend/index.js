@@ -2,7 +2,7 @@ document.getElementById("longurl").onsubmit = async function(event) {
     event.preventDefault();
     try {
         let longUrl = document.getElementById("lurl").value;
-        const response = await fetch("http://localhost:8090/",{
+        const response = await fetch("https://url-shortener-qj2v.onrender.com/",{
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -39,7 +39,7 @@ document.getElementById("delete").onclick = async function(event) {
     try {
         const shortUrl = document.getElementById("surl").value;
         const key = new URL(shortUrl).pathname.slice(1);
-        const response = await fetch("http://localhost:8090/"+key, {
+        const response = await fetch("https://url-shortener-qj2v.onrender.com/"+key, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application-json"
