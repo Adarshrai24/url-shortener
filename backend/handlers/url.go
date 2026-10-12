@@ -38,7 +38,7 @@ func ShortenURL(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "missing url parameter", http.StatusBadRequest)
 		return
 	}
-	longURL := req.URL	
+	longURL := req.URL
 	var url models.Url
 	err = db.DB.QueryRow(
 		`SELECT id, key, short_url, long_url

@@ -1,18 +1,18 @@
 package main
 
 import (
-	"log"
-	"fmt"
-	"net/http"
-	"github.com/Adarshrai24/url-shortener/handlers"
-	"github.com/Adarshrai24/url-shortener/db"
 	"database/sql"
-	_ "github.com/lib/pq"
+	"fmt"
+	"github.com/Adarshrai24/url-shortener/db"
+	"github.com/Adarshrai24/url-shortener/handlers"
 	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
+	"log"
+	"net/http"
 	"os"
 )
 
-func main(){
+func main() {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
@@ -34,7 +34,7 @@ func main(){
 	if err != nil {
 		log.Fatal(err)
 	}
-	
+
 	mux := http.NewServeMux()
 	mux.Handle(
 		"GET /static/",
