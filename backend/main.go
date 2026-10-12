@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	"github.com/Adarshrai24/url-shortener/db"
 	"github.com/Adarshrai24/url-shortener/handlers"
 	"github.com/joho/godotenv"
@@ -13,19 +12,12 @@ import (
 )
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
+	_ = godotenv.Load()
+	databaseURL := os.Getenv("DATABASE_URL")
+	if databaseURL == "" {
+		log.Fatal("DATABASE_URL is not set")
 	}
-	user := os.Getenv("DB_USER")
-	host := os.Getenv("DB_HOST")
-	password := os.Getenv("DB_PASSWORD")
-	name := os.Getenv("DB_NAME")
-	connStr := fmt.Sprintf(
-		"host=%s user=%s password=%s dbname=%s sslmode=disable",
-		host, user, password, name,
-	)
-	conn, err := sql.Open("postgres", connStr)
+	conn, err := sql.Open("postgres", databaseURL)
 	db.DB = conn
 	if err != nil {
 		panic(err)
