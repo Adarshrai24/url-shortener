@@ -26,7 +26,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8090"
+	}
 	mux := http.NewServeMux()
 	mux.Handle(
 		"GET /static/",
@@ -41,5 +44,5 @@ func main() {
 	mux.HandleFunc("POST /", handlers.ShortenURL)
 	mux.HandleFunc("GET /{key}", handlers.GetURL)
 	mux.HandleFunc("DELETE /{key}", handlers.DeleteURL)
-	http.ListenAndServe(":8090", mux)
+	http.ListenAndServe(":"+port, mux)
 }
