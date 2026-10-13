@@ -73,6 +73,8 @@ func ShortenURL(w http.ResponseWriter, r *http.Request) {
 	err = db.DB.QueryRow(
 		`INSERT INTO public.url (key, short_url, long_url)
 		 VALUES ($1, $2, $3)
+		 ON CONFLICT (long_url)
+		 DO UPDATE SET long_url = EXCLUDED.long_url
 		 RETURNING id`,
 		url.Key, url.ShortURL, url.LongURL,
 	).Scan(&url.ID)
