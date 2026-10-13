@@ -48,7 +48,7 @@ func TestShortenURL_NewURL(t *testing.T) {
 		WithArgs(sqlmock.AnyArg()).
 		WillReturnRows(sqlmock.NewRows([]string{"exists"}).AddRow(false))
 
-	mock.ExpectQuery(`INSERT INTO public\.url \(key, short_url, long_url\)\s+VALUES \(\$1, \$2, \$3\)\s+RETURNING id`).
+	mock.ExpectQuery(`INSERT INTO public\.url \(key, short_url, long_url\)\s+VALUES \(\$1, \$2, \$3\)\s+ON CONFLICT \(long_url\)\s+DO UPDATE SET long_url = EXCLUDED\.long_url\s+RETURNING id`).
 		WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg(), longURL).
 		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
 
@@ -130,7 +130,7 @@ func TestShortenURL_InvalidJSON(t *testing.T) {
 		WithArgs(sqlmock.AnyArg()).
 		WillReturnRows(sqlmock.NewRows([]string{"exists"}).AddRow(false))
 
-	mock.ExpectQuery(`INSERT INTO public\.url \(key, short_url, long_url\)\s+VALUES \(\$1, \$2, \$3\)\s+RETURNING id`).
+	mock.ExpectQuery(`INSERT INTO public\.url \(key, short_url, long_url\)\s+VALUES \(\$1, \$2, \$3\)\s+ON CONFLICT \(long_url\)\s+DO UPDATE SET long_url = EXCLUDED\.long_url\s+RETURNING id`).
 		WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg(), "").
 		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
 
@@ -158,7 +158,7 @@ func TestShortenURL_MissingURL(t *testing.T) {
 		WithArgs(sqlmock.AnyArg()).
 		WillReturnRows(sqlmock.NewRows([]string{"exists"}).AddRow(false))
 
-	mock.ExpectQuery(`INSERT INTO public\.url \(key, short_url, long_url\)\s+VALUES \(\$1, \$2, \$3\)\s+RETURNING id`).
+	mock.ExpectQuery(`INSERT INTO public\.url \(key, short_url, long_url\)\s+VALUES \(\$1, \$2, \$3\)\s+ON CONFLICT \(long_url\)\s+DO UPDATE SET long_url = EXCLUDED\.long_url\s+RETURNING id`).
 		WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg(), "").
 		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
 
