@@ -6,7 +6,6 @@ A full-stack URL shortener built with Go (backend) and vanilla JavaScript (front
 
 - **Shorten URLs**: Convert long URLs into short, shareable links
 - **Redirect**: Access original URLs via short keys
-- **Delete**: Remove shortened URLs when no longer needed
 - **Duplicate prevention**: Returns existing short URL if the same long URL is submitted
 - **Collision-resistant keys**: SHA256 + base64url encoding with counter-based collision resolution
 
@@ -32,7 +31,7 @@ url_shortener/
 │   ├── db/
 │   │   └── db.go               # Database connection pool
 │   ├── handlers/
-│   │   ├── url.go              # HTTP handlers: ShortenURL, GetURL, DeleteURL
+│   │   ├── url.go              # HTTP handlers: ShortenURL, GetURL
 │   │   └── url_test.go         # Handler tests
 │   ├── models/
 │   │   ├── url.go              # Request/response models
@@ -54,7 +53,6 @@ url_shortener/
 |--------|------|-------------|
 | `POST` | `/` | Create a short URL. Body: `{"url": "https://example.com"}` |
 | `GET` | `/{key}` | Redirect to the original long URL |
-| `DELETE` | `/{key}` | Delete a shortened URL |
 | `GET` | `/` | Serve frontend HTML |
 | `GET` | `/static/*` | Serve static assets (CSS, JS) |
 
@@ -79,12 +77,6 @@ curl -X POST https://your-domain.com/ \
 ```bash
 curl -L https://your-domain.com/aB3xY9z
 # Redirects to https://github.com/Adarshrai24
-```
-
-**Delete**
-```bash
-curl -X DELETE https://your-domain.com/aB3xY9z
-# Returns 204 No Content
 ```
 
 ## Getting Started
