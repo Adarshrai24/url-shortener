@@ -43,6 +43,5 @@ func main() {
 	})
 	mux.HandleFunc("POST /", handlers.ShortenURL)
 	mux.HandleFunc("GET /{key}", handlers.GetURL)
-	mux.HandleFunc("DELETE /{key}", handlers.DeleteURL)
 	http.ListenAndServe(":"+port, mux)
 }

@@ -114,30 +114,3 @@ func GetURL(w http.ResponseWriter, r *http.Request) {
 
 	http.Redirect(w, r, URL.LongURL, http.StatusFound)
 }
-
-func DeleteURL(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	key := r.PathValue("key")
-	result, err := db.DB.Exec(
-		`DELETE FROM public.url
-		WHERE key = $1	
-		`,
-		key,
-	)
-
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	rows, err := result.RowsAffected()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	if rows == 0 {
-		http.Error(w, "URL not found", http.StatusNotFound)
-		return
-	}
-
-	w.WriteHeader(http.StatusNoContent)
-}

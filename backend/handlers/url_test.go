@@ -30,7 +30,6 @@ func setupTestDB(t *testing.T) (*sql.DB, sqlmock.Sqlmock, func()) {
 func makeTestServer() *httptest.Server {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /{key}", GetURL)
-	mux.HandleFunc("DELETE /{key}", DeleteURL)
 	return httptest.NewServer(mux)
 }
 
@@ -227,64 +226,6 @@ func TestGetURL_NotFound(t *testing.T) {
 
 	req, _ := http.NewRequest(http.MethodGet, server.URL+"/"+key, nil)
 	resp, err := client.Do(req)
-	if err != nil {
-		t.Fatalf("request failed: %v", err)
-	}
-	defer resp.Body.Close()
-
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Errorf("unfulfilled mock expectations: %v", err)
-	}
-
-	if resp.StatusCode != http.StatusNotFound {
-		t.Errorf("expected status %d, got %d", http.StatusNotFound, resp.StatusCode)
-	}
-}
-
-func TestDeleteURL_Success(t *testing.T) {
-	_, mock, cleanup := setupTestDB(t)
-	defer cleanup()
-
-	key := "todelete"
-
-	mock.ExpectExec(`DELETE FROM public\.url`).
-		WithArgs(key).
-		WillReturnResult(sqlmock.NewResult(0, 1))
-
-	server := makeTestServer()
-	defer server.Close()
-
-	req, _ := http.NewRequest(http.MethodDelete, server.URL+"/"+key, nil)
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		t.Fatalf("request failed: %v", err)
-	}
-	defer resp.Body.Close()
-
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Errorf("unfulfilled mock expectations: %v", err)
-	}
-
-	if resp.StatusCode != http.StatusNoContent {
-		t.Errorf("expected status %d, got %d", http.StatusNoContent, resp.StatusCode)
-	}
-}
-
-func TestDeleteURL_NotFound(t *testing.T) {
-	_, mock, cleanup := setupTestDB(t)
-	defer cleanup()
-
-	key := "nonexistent"
-
-	mock.ExpectExec(`DELETE FROM public\.url`).
-		WithArgs(key).
-		WillReturnResult(sqlmock.NewResult(0, 0))
-
-	server := makeTestServer()
-	defer server.Close()
-
-	req, _ := http.NewRequest(http.MethodDelete, server.URL+"/"+key, nil)
-	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		t.Fatalf("request failed: %v", err)
 	}
