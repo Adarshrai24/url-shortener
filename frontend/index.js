@@ -34,23 +34,3 @@ document.getElementById("copy").onclick = function() {
         document.getElementById("copy-status").textContent = "Failed to copy";
     });
 }
-
-document.getElementById("delete").onclick = async function(event) {
-    try {
-        const shortUrl = document.getElementById("surl").value;
-        const key = new URL(shortUrl).pathname.slice(1);
-        const response = await fetch("https://url-shortener-qj2v.onrender.com/"+key, {
-            method: "DELETE",
-            headers: {
-                "Content-Type": "application-json"
-            }, 
-        });
-        if (!response.ok) {
-           alert("something went wrong");
-           return
-        }
-        document.getElementById("surl").value = "";
-    } catch (error) {
-       alert("Request failed. Please try again");
-    }
-}
