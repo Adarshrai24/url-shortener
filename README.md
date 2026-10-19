@@ -8,6 +8,7 @@ A full-stack URL shortener built with Go (backend) and vanilla JavaScript (front
 - **Redirect**: Access original URLs via short keys
 - **Duplicate prevention**: Returns existing short URL if the same long URL is submitted
 - **Collision-resistant keys**: SHA256 + base64url encoding with counter-based collision resolution
+- **Rate limiting**: Limits URL creation and redirects per client IP using a token bucket
 
 ## Tech Stack
 
@@ -33,12 +34,17 @@ url_shortener/
 │   ├── handlers/
 │   │   ├── url.go              # HTTP handlers: ShortenURL, GetURL
 │   │   └── url_test.go         # Handler tests
+│   ├── middleware/
+│   │   ├── rate_limiter.go     # Per-client-IP rate-limiting middleware
+│   │   └── rate_limiter_test.go
 │   ├── models/
 │   │   ├── url.go              # Request/response models
 │   │   └── url_test.go         # Model tests
 │   └── utils/
 │       ├── hash.go             # SHA256 + base64url key generation (7 chars)
-│       └── hash_test.go        # Hash utility tests
+│       ├── hash_test.go        # Hash utility tests
+│       ├── rate_limiter.go     # In-memory token-bucket implementation
+│       └── rate_limiter_test.go
 ├── frontend/
 │   ├── index.html              # Main HTML page
 │   ├── index.js                # Client-side logic (fetch, copy, delete)
@@ -55,6 +61,12 @@ url_shortener/
 | `GET` | `/{key}` | Redirect to the original long URL |
 | `GET` | `/` | Serve frontend HTML |
 | `GET` | `/static/*` | Serve static assets (CSS, JS) |
+
+Rate limiting applies to `POST /` and `GET /{key}`. Each client IP gets a bucket
+with a capacity of 60 requests, replenished at 1 request per second. Requests
+made without an available token receive `429 Too Many Requests`. The bucket
+state is kept in memory per server process, so it resets when the process
+restarts and is not shared between multiple server instances.
 
 ### Request/Response Examples
 
@@ -148,6 +160,14 @@ Required secret: `RENDER_DEPLOY_HOOK_URL` (from Render service settings)
 ### Duplicate Handling
 
 Before creating a new entry, the handler checks if the `long_url` already exists in the database and returns the existing short URL.
+
+### Rate Limiting
+
+The rate-limiting middleware identifies clients by the IP address parsed from
+the request's remote address and applies the token-bucket limit to URL creation
+and short-key redirects. A malformed remote address receives `400 Bad Request`.
+The limiter's in-memory state is protected for concurrent requests, but is
+local to each server process.
 
 ### Static File Serving
 
