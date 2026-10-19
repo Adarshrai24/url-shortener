@@ -2,13 +2,15 @@ package main
 
 import (
 	"database/sql"
-	"github.com/Adarshrai24/url-shortener/db"
-	"github.com/Adarshrai24/url-shortener/handlers"
-	"github.com/joho/godotenv"
-	_ "github.com/lib/pq"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/Adarshrai24/url-shortener/db"
+	"github.com/Adarshrai24/url-shortener/handlers"
+	"github.com/Adarshrai24/url-shortener/middleware"
+	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 )
 
 func main() {
@@ -41,7 +43,11 @@ func main() {
 	mux.HandleFunc("GET /{$}", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "../frontend/index.html")
 	})
-	mux.HandleFunc("POST /", handlers.ShortenURL)
-	mux.HandleFunc("GET /{key}", handlers.GetURL)
+	mux.Handle("POST /", middleware.RateLimiter(
+		http.HandlerFunc(handlers.ShortenURL),
+	))
+	mux.Handle("GET /{key}", middleware.RateLimiter(
+		http.HandlerFunc(handlers.GetURL),
+	))
 	http.ListenAndServe(":"+port, mux)
 }
